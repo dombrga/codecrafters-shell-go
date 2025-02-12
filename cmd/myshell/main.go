@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-var exitCommand = "exit"
+var exitCommand = "exit 0"
 
 func main() {
 
@@ -26,11 +26,11 @@ func main() {
 		// without the \n
 		// var commands = strings.Split(c, " ")
 		var command = c[:len(c)-1]
-		if command == (exitCommand + " 0") {
+		if command == exitCommand {
 			// var firstArg = os.Args[0]
 			// fmt.Println("first arg", firstArg)
 			os.Exit(0)
 		}
-		fmt.Printf("%s: command not found\n", command[:len(command)-1])
+		fmt.Printf("%s: command not found\n", command)
 	}
 }
