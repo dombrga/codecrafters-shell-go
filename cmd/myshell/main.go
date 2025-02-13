@@ -4,9 +4,11 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 )
 
-var exitCommand = "exit 0"
+var exit0Command = "exit 0"
+var echoCommand = "echo"
 
 func main() {
 
@@ -25,12 +27,17 @@ func main() {
 
 		// without the \n
 		// var commands = strings.Split(c, " ")
-		var command = c[:len(c)-1]
-		if command == exitCommand {
-			// var firstArg = os.Args[0]
-			// fmt.Println("first arg", firstArg)
+		var input = strings.TrimSpace(c)
+		var split = strings.Split(input, " ")
+		var command = split[0]
+
+		switch command {
+		case exit0Command:
 			os.Exit(0)
+		case echoCommand:
+			fmt.Fprintln(os.Stdout, strings.Join(split[1:], " "))
+		default:
+			fmt.Printf("%s: command not found\n", input)
 		}
-		fmt.Printf("%s: command not found\n", command)
 	}
 }
