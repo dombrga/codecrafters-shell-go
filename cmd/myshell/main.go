@@ -51,7 +51,7 @@ func main() {
 				if ok {
 					fmt.Fprintf(os.Stdout, "%s is a shell builtin\n", arg)
 				} else {
-					fmt.Fprintf(os.Stdout, "%s: command not found\n", split[1])
+					fmt.Fprintf(os.Stdout, "%s: not found\n", split[1])
 				}
 			}
 		default:
