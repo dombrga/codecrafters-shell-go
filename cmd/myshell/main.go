@@ -26,18 +26,21 @@ func main() {
 		// fmt.Println("inout c", c)
 
 		// without the \n
-		// var commands = strings.Split(c, " ")
 		var input = strings.TrimSpace(c)
 		var split = strings.Split(input, " ")
 		var command = split[0]
 
 		switch command {
-		case exit0Command:
-			os.Exit(0)
+		case "exit":
+			if len(split) > 1 && split[1] == "0" {
+				os.Exit(0)
+			}
 		case echoCommand:
 			fmt.Fprintln(os.Stdout, strings.Join(split[1:], " "))
 		default:
-			fmt.Printf("%s: command not found\n", input)
+			fmt.Fprintf(os.Stdout, "%s: command not found\n", input)
 		}
+
+		// fmt.Printf("%s: command not found\n", input)
 	}
 }
