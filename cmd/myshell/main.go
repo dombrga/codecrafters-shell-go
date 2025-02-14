@@ -54,11 +54,11 @@ MAIN_LOOP:
 				if ok {
 					fmt.Fprintf(os.Stdout, "%s is a shell builtin\n", biCmd)
 				} else {
-					var _path = os.Getenv("PATH")
-					var path = strings.Split(_path, string(os.PathSeparator))
+					var _PATH = os.Getenv("PATH")
+					var paths = strings.Split(_PATH, string(os.PathListSeparator))
 
 					// loop all paths
-					for _, p := range path {
+					for _, p := range paths {
 						ls, err := os.ReadDir(p)
 						if err != nil {
 							// fmt.Fprintf(os.Stdout, "%s: not found\n", typeArg)
