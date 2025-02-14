@@ -60,7 +60,10 @@ MAIN_LOOP:
 					for _, p := range path {
 						ls, err := os.ReadDir(p)
 						if err != nil {
-							fmt.Fprintln(os.Stdout, "error ReadDir:", err)
+							// fmt.Fprintf(os.Stdout, "%s: not found\n", typeArg)
+							continue
+							// fmt.Fprintln(os.Stdout, "error ReadDir:", err, p)
+							// continue MAIN_LOOP
 						}
 
 						for _, entry := range ls {
