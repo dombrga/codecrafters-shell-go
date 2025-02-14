@@ -55,8 +55,9 @@ MAIN_LOOP:
 					fmt.Fprintf(os.Stdout, "%s is a shell builtin\n", biCmd)
 				} else {
 					var _path = os.Getenv("PATH")
-					var path = strings.Split(_path, ":")
+					var path = strings.Split(_path, string(os.PathSeparator))
 
+					// loop all paths
 					for _, p := range path {
 						ls, err := os.ReadDir(p)
 						if err != nil {
@@ -66,6 +67,7 @@ MAIN_LOOP:
 							// continue MAIN_LOOP
 						}
 
+						// loop contents of current path
 						for _, entry := range ls {
 							entryName := entry.Name()
 							if entryName == typeArg {
