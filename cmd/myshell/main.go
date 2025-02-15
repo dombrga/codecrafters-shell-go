@@ -59,21 +59,15 @@ MAIN_LOOP:
 
 					// loop all paths
 					for _, p := range paths {
-						ls, err := os.ReadDir(p)
+						stat, err := os.Stat(p + "/" + typeArg)
+
 						if err != nil {
-							// fmt.Fprintf(os.Stdout, "%s: not found\n", typeArg)
 							continue
-							// fmt.Fprintln(os.Stdout, "error ReadDir:", err, p)
-							// continue MAIN_LOOP
 						}
 
-						// loop contents of current path
-						for _, entry := range ls {
-							entryName := entry.Name()
-							if entryName == typeArg {
-								fmt.Fprintf(os.Stdout, "%s is %s/%s\n", typeArg, p, typeArg)
-								continue MAIN_LOOP // once found, don't run below by continuing MAIN_LOOP
-							}
+						if stat != nil {
+							fmt.Fprintf(os.Stdout, "%s is %s/%s\n", typeArg, p, typeArg)
+							continue MAIN_LOOP // once found, don't run below by continuing MAIN_LOOP
 						}
 					}
 
