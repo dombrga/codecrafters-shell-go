@@ -18,7 +18,7 @@ var builtinCmds = map[string]string{
 }
 
 func main() {
-MAIN_LOOP:
+	// MAIN_LOOP:
 	for {
 		// Uncomment this block to pass the first stage
 		fmt.Fprint(os.Stdout, "$ ")
@@ -54,29 +54,44 @@ MAIN_LOOP:
 				if ok {
 					fmt.Fprintf(os.Stdout, "%s is a shell builtin\n", biCmd)
 				} else {
-					var _PATH = os.Getenv("PATH")
-					var paths = strings.Split(_PATH, string(os.PathListSeparator))
-
-					// loop all paths
-					for _, p := range paths {
-						stat, err := os.Stat(p + "/" + typeArg)
-
-						if err != nil {
-							continue
-						}
-
-						if stat != nil {
-							fmt.Fprintf(os.Stdout, "%s is %s/%s\n", typeArg, p, typeArg)
-							continue MAIN_LOOP // once found, don't run below by continuing MAIN_LOOP
-						}
+					isInCmd, p := isCmdInPath(typeArg)
+					if isInCmd {
+						fmt.Fprintf(os.Stdout, "%s is %s/%s\n", typeArg, p, typeArg)
+					} else {
+						fmt.Fprintf(os.Stdout, "%s: not found\n", typeArg)
 					}
-
-					fmt.Fprintf(os.Stdout, "%s: not found\n", typeArg)
 				}
 
 			}
 		default:
+			// external programs in PATH
+			// args := os.Args
+			// // cmd := args[0]
+			// fmt.Printf("Program was passed %d args including program name.\n", len(args))
+			// for i, arg := range args {
+			// 	fmt.Printf("Arg #%d: %s\n", i+1, arg)
+			// }
+
+			// cmd not found
 			fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
 		}
 	}
+}
+
+// returns true if in PATH and its absolute path
+func isCmdInPath(cmd string) (bool, string) {
+	var _PATH = os.Getenv("PATH")
+	var paths = strings.Split(_PATH, string(os.PathListSeparator))
+
+	// loop all paths
+	for _, p := range paths {
+		stat, err := os.Stat(p + "/" + cmd)
+		if err != nil || stat == nil {
+			continue
+		}
+
+		return true, p
+	}
+
+	return false, ""
 }
