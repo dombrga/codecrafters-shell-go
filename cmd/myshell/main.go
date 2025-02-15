@@ -2,7 +2,9 @@ package main
 
 import (
 	"bufio"
+	"crypto/rand"
 	"fmt"
+	"math/big"
 	"os"
 	"strings"
 )
@@ -17,10 +19,11 @@ var builtinCmds = map[string]string{
 	typeCommand: typeCommand,
 }
 
+var _PATH = os.Getenv("PATH")
+var paths = strings.Split(_PATH, string(os.PathListSeparator))
+
 func main() {
-	// MAIN_LOOP:
 	for {
-		// Uncomment this block to pass the first stage
 		fmt.Fprint(os.Stdout, "$ ")
 
 		// Wait for user input
@@ -35,24 +38,22 @@ func main() {
 		var input = strings.TrimSpace(c)
 		var split = strings.Split(input, " ")
 		var command = split[0]
+		// var args = split[1:]
 
 		switch command {
 		case "":
 			fmt.Print()
 		case exitCommand:
 			os.Exit(0)
-			// if len(split) > 1 && split[1] == "0" {
-			// 	os.Exit(0)
-			// }
 		case echoCommand:
 			fmt.Fprintln(os.Stdout, strings.Join(split[1:], " "))
 		case typeCommand:
 			if len(split) > 1 {
 				typeArg := split[1]
-				var biCmd, ok = builtinCmds[typeArg] // biCmd is a builtin command that is the argument of type command
+				_, ok := builtinCmds[typeArg]
 
 				if ok {
-					fmt.Fprintf(os.Stdout, "%s is a shell builtin\n", biCmd)
+					fmt.Fprintf(os.Stdout, "%s is a shell builtin\n", typeArg)
 				} else {
 					isInCmd, p := isCmdInPath(typeArg)
 					if isInCmd {
@@ -61,28 +62,37 @@ func main() {
 						fmt.Fprintf(os.Stdout, "%s: not found\n", typeArg)
 					}
 				}
-
 			}
 		default:
-			// external programs in PATH
-			// args := os.Args
-			// // cmd := args[0]
-			// fmt.Printf("Program was passed %d args including program name.\n", len(args))
-			// for i, arg := range args {
-			// 	fmt.Printf("Arg #%d: %s\n", i+1, arg)
-			// }
+			// external programs that are in PATH
+			ok, _ := isCmdInPath(command)
+			if ok {
+				fmt.Printf("Program was passed %d args (including program name).\n", len(split))
 
-			// cmd not found
-			fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
+				for i, arg := range split {
+					if i == 0 {
+						fmt.Printf("Arg #%d (program name): %s\n", i, arg)
+					} else {
+						fmt.Printf("Arg #%d: %s\n", i, arg)
+					}
+				}
+
+				sig, err := rand.Int(rand.Reader, big.NewInt(9999999))
+				if err != nil {
+					fmt.Println("error in signature:", err)
+				}
+
+				fmt.Printf("Program Signature: %d\n", sig.Int64())
+			} else {
+				// cmd not found
+				fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
+			}
 		}
 	}
 }
 
 // returns true if in PATH and its absolute path
 func isCmdInPath(cmd string) (bool, string) {
-	var _PATH = os.Getenv("PATH")
-	var paths = strings.Split(_PATH, string(os.PathListSeparator))
-
 	// loop all paths
 	for _, p := range paths {
 		stat, err := os.Stat(p + "/" + cmd)
