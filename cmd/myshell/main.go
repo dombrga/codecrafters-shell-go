@@ -2,10 +2,9 @@ package main
 
 import (
 	"bufio"
-	"crypto/rand"
 	"fmt"
-	"math/big"
 	"os"
+	"os/exec"
 	"strings"
 )
 
@@ -65,28 +64,38 @@ func main() {
 			}
 		default:
 			// external programs that are in PATH
-			ok, _ := isCmdInPath(command)
-			if ok {
-				fmt.Printf("Program was passed %d args (including program name).\n", len(split))
-
-				for i, arg := range split {
-					if i == 0 {
-						fmt.Printf("Arg #%d (program name): %s\n", i, arg)
-					} else {
-						fmt.Printf("Arg #%d: %s\n", i, arg)
-					}
-				}
-
-				sig, err := rand.Int(rand.Reader, big.NewInt(9999999))
-				if err != nil {
-					fmt.Println("error in signature:", err)
-				}
-
-				fmt.Printf("Program Signature: %d\n", sig.Int64())
+			runCmd := exec.Command(command, split[:1]...)
+			runCmd.Stdout = os.Stdout
+			runCmd.Stderr = os.Stderr
+			err := runCmd.Run()
+			if err != nil {
+				fmt.Println("err runcmd:", err)
 			} else {
-				// cmd not found
 				fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
 			}
+
+			// ok, _ := isCmdInPath(command)
+			// if ok {
+			// 	fmt.Printf("Program was passed %d args (including program name).\n", len(split))
+
+			// 	for i, arg := range split {
+			// 		if i == 0 {
+			// 			fmt.Printf("Arg #%d (program name): %s\n", i, arg)
+			// 		} else {
+			// 			fmt.Printf("Arg #%d: %s\n", i, arg)
+			// 		}
+			// 	}
+
+			// 	sig, err := rand.Int(rand.Reader, big.NewInt(9999999))
+			// 	if err != nil {
+			// 		fmt.Println("error in signature:", err)
+			// 	}
+
+			// 	fmt.Printf("Program Signature: %d\n", sig.Int64())
+			// } else {
+			// 	// cmd not found
+			// 	fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
+			// }
 		}
 	}
 }
