@@ -64,7 +64,7 @@ func main() {
 			}
 		default:
 			// external programs that are in PATH
-			runCmd := exec.Command(command, split[:1]...)
+			runCmd := exec.Command(command, split[1:]...)
 			runCmd.Stdout = os.Stdout
 			runCmd.Stderr = os.Stderr
 			err := runCmd.Run()
