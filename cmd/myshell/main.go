@@ -12,10 +12,12 @@ var exitCommand = "exit"
 var exit0Command = "exit 0"
 var echoCommand = "echo"
 var typeCommand = "type"
+var pwdCommand = "pwd"
 var builtinCmds = map[string]string{
 	echoCommand: echoCommand,
 	exitCommand: exitCommand,
 	typeCommand: typeCommand,
+	pwdCommand:  pwdCommand,
 }
 
 var _PATH = os.Getenv("PATH")
@@ -46,6 +48,13 @@ func main() {
 			os.Exit(0)
 		case echoCommand:
 			fmt.Fprintln(os.Stdout, strings.Join(split[1:], " "))
+		case pwdCommand:
+			dir, err := os.Getwd()
+			if err != nil {
+				fmt.Fprintln(os.Stdout, "error printing working directory:", err)
+			} else {
+				fmt.Fprintln(os.Stdout, dir)
+			}
 		case typeCommand:
 			if len(split) > 1 {
 				typeArg := split[1]
