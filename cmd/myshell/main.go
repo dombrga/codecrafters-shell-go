@@ -69,9 +69,9 @@ func main() {
 			runCmd.Stderr = os.Stderr
 			err := runCmd.Run()
 			if err != nil {
-				fmt.Println("err runcmd:", err)
-			} else {
-				fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
+				if strings.Contains(err.Error(), exec.ErrNotFound.Error()) {
+					fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
+				}
 			}
 
 			// ok, _ := isCmdInPath(command)
