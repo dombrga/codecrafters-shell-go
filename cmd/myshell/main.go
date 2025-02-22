@@ -13,11 +13,13 @@ var exit0Command = "exit 0"
 var echoCommand = "echo"
 var typeCommand = "type"
 var pwdCommand = "pwd"
+var cdCommand = "cd"
 var builtinCmds = map[string]string{
 	echoCommand: echoCommand,
 	exitCommand: exitCommand,
 	typeCommand: typeCommand,
 	pwdCommand:  pwdCommand,
+	cdCommand:   cdCommand,
 }
 
 var _PATH = os.Getenv("PATH")
@@ -41,9 +43,10 @@ func main() {
 		var command = split[0]
 		// var args = split[1:]
 
-		switch command {
+		// fmt.Println("asdzxc", builtinCmds[command], len(builtinCmds[command]))
+		switch builtinCmds[command] {
 		case "":
-			fmt.Print()
+			fmt.Print("")
 		case exitCommand:
 			os.Exit(0)
 		case echoCommand:
@@ -54,6 +57,10 @@ func main() {
 				fmt.Fprintln(os.Stdout, "error printing working directory:", err)
 			} else {
 				fmt.Fprintln(os.Stdout, dir)
+			}
+		case cdCommand:
+			if len(split) > 1 {
+				runCdCmd(split[1])
 			}
 		case typeCommand:
 			if len(split) > 1 {
@@ -72,6 +79,7 @@ func main() {
 				}
 			}
 		default:
+			fmt.Println("defaulting")
 			// external programs that are in PATH
 			runCmd := exec.Command(command, split[1:]...)
 			runCmd.Stdout = os.Stdout
@@ -82,6 +90,17 @@ func main() {
 					fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
 				}
 			}
+		}
+	}
+}
+
+func runCdCmd(dir string) {
+	if dir == "" {
+		fmt.Println()
+	} else {
+		err := os.Chdir(dir)
+		if err != nil {
+			fmt.Printf("cd: %s: No such file or directory\n", dir)
 		}
 	}
 }
