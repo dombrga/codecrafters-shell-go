@@ -102,7 +102,7 @@ func runCdCmd(dir string) {
 
 	err := os.Chdir(_dir)
 	if err != nil {
-		fmt.Printf("cd: %s: No such file or directory\n", dir)
+		fmt.Printf("cd: %s: No such file or directory\n", _dir)
 	}
 }
 
