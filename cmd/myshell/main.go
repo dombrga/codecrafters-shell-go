@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"slices"
 	"strings"
 )
 
@@ -95,17 +96,21 @@ func main() {
 	}
 }
 
+// it first checks if the echo argument is enclosed in single quotes
 func runEchoCmd(input string) {
-	s := strings.SplitAfterN(input, " ", 2)
-	argSingleQuoted := s[1]
-	if strings.HasPrefix(argSingleQuoted, "'") && strings.HasSuffix(argSingleQuoted, "'") {
-		echo := strings.TrimFunc(argSingleQuoted, func(r rune) bool {
-			return string(r) == "'"
-		})
-		fmt.Fprintln(os.Stdout, echo)
-	} else {
-		echo := strings.Join(strings.Fields(input[len("echo")+1:]), " ")
-		fmt.Fprintln(os.Stdout, echo)
+	split := strings.Split(input, " ")
+	if len(split) > 1 {
+		s := strings.SplitAfterN(input, " ", 2)
+		argSingleQuoted := strings.Split(s[1], "")
+		if argSingleQuoted[0] == "'" && argSingleQuoted[len(argSingleQuoted)-1] == "'" {
+			echo := slices.DeleteFunc(argSingleQuoted, func(_s string) bool {
+				return _s == "'"
+			})
+			fmt.Fprintln(os.Stdout, strings.Join(echo, ""))
+		} else {
+			echo := strings.Join(strings.Fields(input[len("echo")+1:]), " ")
+			fmt.Fprintln(os.Stdout, echo)
+		}
 	}
 }
 
