@@ -79,7 +79,7 @@ func main() {
 				}
 			}
 		default:
-			fmt.Println("defaulting")
+			// fmt.Println("defaulting")
 			// external programs that are in PATH
 			runCmd := exec.Command(command, split[1:]...)
 			runCmd.Stdout = os.Stdout
