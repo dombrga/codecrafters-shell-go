@@ -104,7 +104,8 @@ func runEchoCmd(input string) {
 		})
 		fmt.Fprintln(os.Stdout, echo)
 	} else {
-		fmt.Fprintln(os.Stdout, input[len("echo")+1:])
+		echo := strings.Join(strings.Fields(input[len("echo")+1:]), " ")
+		fmt.Fprintln(os.Stdout, echo)
 	}
 }
 
