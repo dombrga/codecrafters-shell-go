@@ -41,7 +41,7 @@ func main() {
 		var input = strings.TrimSpace(c)
 		var split = strings.Split(input, " ")
 		var command = split[0]
-		// var args = split[1:]
+		// var args = input[1:]
 
 		// fmt.Println("asdzxc", builtinCmds[command], len(builtinCmds[command]))
 		switch command {
@@ -50,7 +50,8 @@ func main() {
 		case exitCommand:
 			os.Exit(0)
 		case echoCommand:
-			fmt.Fprintln(os.Stdout, strings.Join(split[1:], " "))
+			// fmt.Fprintln(os.Stdout, strings.Join(split[1:], " "))
+			runEchoCmd(input)
 		case pwdCommand:
 			dir, err := os.Getwd()
 			if err != nil {
@@ -91,6 +92,19 @@ func main() {
 				}
 			}
 		}
+	}
+}
+
+func runEchoCmd(input string) {
+	s := strings.SplitAfterN(input, " ", 2)
+	argSingleQuoted := s[1]
+	if strings.HasPrefix(argSingleQuoted, "'") && strings.HasSuffix(argSingleQuoted, "'") {
+		echo := strings.TrimFunc(argSingleQuoted, func(r rune) bool {
+			return string(r) == "'"
+		})
+		fmt.Fprintln(os.Stdout, echo)
+	} else {
+		fmt.Fprintln(os.Stdout, input[len("echo")+1:])
 	}
 }
 
