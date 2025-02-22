@@ -44,7 +44,7 @@ func main() {
 		// var args = split[1:]
 
 		// fmt.Println("asdzxc", builtinCmds[command], len(builtinCmds[command]))
-		switch builtinCmds[command] {
+		switch command {
 		case "":
 			fmt.Print("")
 		case exitCommand:
