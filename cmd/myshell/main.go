@@ -95,13 +95,14 @@ func main() {
 }
 
 func runCdCmd(dir string) {
-	if dir == "" {
-		fmt.Println()
-	} else {
-		err := os.Chdir(dir)
-		if err != nil {
-			fmt.Printf("cd: %s: No such file or directory\n", dir)
-		}
+	var _dir = dir
+	if dir == "~" {
+		_dir = os.Getenv("HOME")
+	}
+
+	err := os.Chdir(_dir)
+	if err != nil {
+		fmt.Printf("cd: %s: No such file or directory\n", dir)
 	}
 }
 
