@@ -84,7 +84,7 @@ func main() {
 			// external programs that are in PATH
 			args := extractSingleQuoted(input)
 			if s, ok := args["quoteds"]; ok {
-				fmt.Fprintln(os.Stdout, len(s[0]), s[0])
+				// fmt.Fprintln(os.Stdout, len(s[0]), s[0])
 				runCmd := exec.Command(command, s...)
 				runCmd.Stdout = os.Stdout
 				runCmd.Stderr = os.Stderr
