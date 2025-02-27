@@ -83,7 +83,7 @@ func main() {
 			// fmt.Println("defaulting", extractSingleQuoted(input))
 			// external programs that are in PATH
 			args := extractSingleQuoted(input)
-			if s, ok := args["unquoteds"]; ok {
+			if s, ok := args["quoteds"]; ok {
 				// fmt.Fprintln(os.Stdout, strings.Join(s, ""))
 				runCmd := exec.Command(command, s...)
 				runCmd.Stdout = os.Stdout
