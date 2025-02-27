@@ -105,7 +105,7 @@ func runEchoCmd(input string) {
 		args := extractSingleQuoted(input)
 		// fmt.Println("args", args)
 		if s, ok := args["unquoteds"]; ok {
-			fmt.Fprintln(os.Stdout, strings.Join(s, " "))
+			fmt.Fprintln(os.Stdout, strings.Join(s, ""))
 		}
 	} else {
 		fmt.Fprintln(os.Stdout, extractNonQuoted(input))
@@ -136,7 +136,7 @@ func extractSingleQuoted(input string) map[string][]string {
 		var quoteds []string
 		var unquoteds []string
 		if argSingleQuoted[0] == "'" && argSingleQuoted[len(argSingleQuoted)-1] == "'" {
-			unquoted := ""
+			unquoted := "" // the string inside a pair of single quotes
 			// quoted := ""
 			sQuote := 0
 			for _, _s := range argSingleQuoted {
@@ -149,8 +149,12 @@ func extractSingleQuoted(input string) map[string][]string {
 						unquoted = ""
 					}
 				} else {
-					if sQuote != 0 {
+					// only append to unquoted when there is a starting single quote already
+					if sQuote == 1 {
 						unquoted = unquoted + _s
+					} else {
+						// append space
+						unquoteds = append(unquoteds, _s)
 					}
 				}
 			}
