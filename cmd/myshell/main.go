@@ -61,12 +61,27 @@ func main() {
 }
 
 func runExtraCmd(input string) {
-	var command = strings.SplitN(input, " ", 2)[0]
+	// fmt.Println("extraa")
+	var _input = strings.SplitN(input, " ", 2)
+	var command = _input[0]
 	args := extractSingleQuoted(input)
 
 	if s, ok := args["quoteds"]; ok {
+		// fmt.Println("extraa ok")
 		// external programs that are in PATH
 		runCmd := exec.Command(command, s...)
+		runCmd.Stdout = os.Stdout
+		runCmd.Stderr = os.Stderr
+
+		err := runCmd.Run()
+		if err != nil {
+			if strings.Contains(err.Error(), exec.ErrNotFound.Error()) {
+				fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
+			}
+		}
+	} else {
+		// external programs that are in PATH
+		runCmd := exec.Command(command, _input[1])
 		runCmd.Stdout = os.Stdout
 		runCmd.Stderr = os.Stderr
 
