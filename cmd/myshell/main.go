@@ -84,7 +84,7 @@ func main() {
 			// external programs that are in PATH
 			args := extractSingleQuoted(input)
 			if s, ok := args["quoteds"]; ok {
-				// fmt.Fprintln(os.Stdout, s)
+				fmt.Fprintln(os.Stdout, len(s[0]), s[0])
 				runCmd := exec.Command(command, s...)
 				runCmd.Stdout = os.Stdout
 				runCmd.Stderr = os.Stderr
@@ -144,7 +144,8 @@ func extractSingleQuoted(input string) map[string][]string {
 					sQuote++
 					if sQuote == 2 {
 						unquoteds = append(unquoteds, unquoted)
-						quoteds = append(quoteds, "'"+unquoted+"'")
+						// quoteds = append(quoteds, "'"+unquoted+"'")
+						quoteds = append(quoteds, unquoted)
 						sQuote = 0
 						unquoted = ""
 					}
