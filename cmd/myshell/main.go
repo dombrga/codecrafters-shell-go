@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"slices"
 	"strings"
 )
 
@@ -81,7 +80,7 @@ func main() {
 				}
 			}
 		default:
-			// fmt.Println("defaulting")
+			fmt.Println("defaulting", extractSingleQuoted(input))
 			// external programs that are in PATH
 			runCmd := exec.Command(command, split[1:]...)
 			runCmd.Stdout = os.Stdout
@@ -98,20 +97,70 @@ func main() {
 
 // it first checks if the echo argument is enclosed in single quotes
 func runEchoCmd(input string) {
+	if isSingleQuoted(input) {
+		fmt.Fprintln(os.Stdout, extractSingleQuoted(input))
+	} else {
+		fmt.Fprintln(os.Stdout, extractNonQuoted(input))
+	}
+}
+
+func isSingleQuoted(input string) bool {
 	split := strings.Split(input, " ")
 	if len(split) > 1 {
+		// split command and arguments
 		s := strings.SplitAfterN(input, " ", 2)
+
 		argSingleQuoted := strings.Split(s[1], "")
 		if argSingleQuoted[0] == "'" && argSingleQuoted[len(argSingleQuoted)-1] == "'" {
-			echo := slices.DeleteFunc(argSingleQuoted, func(_s string) bool {
-				return _s == "'"
-			})
-			fmt.Fprintln(os.Stdout, strings.Join(echo, ""))
-		} else {
-			echo := strings.Join(strings.Fields(input[len("echo")+1:]), " ")
-			fmt.Fprintln(os.Stdout, echo)
+			return true
 		}
 	}
+	return false
+}
+
+func extractSingleQuoted(input string) string {
+	split := strings.Split(input, " ")
+	if len(split) > 1 {
+		// split command and arguments
+		s := strings.SplitAfterN(input, " ", 2)
+
+		argSingleQuoted := strings.Split(s[1], "")
+		var args []string
+		if argSingleQuoted[0] == "'" && argSingleQuoted[len(argSingleQuoted)-1] == "'" {
+			arg := ""
+			sQuote := 0
+			for _, _s := range argSingleQuoted {
+				// fmt.Println("single arg:", _s)
+				if _s == "'" {
+					// fmt.Println("single quote:", _s, sQuote)
+					sQuote++
+					if sQuote == 2 {
+						args = append(args, arg)
+						sQuote = 0
+						arg = ""
+					}
+				} else {
+					// fmt.Println("single not quote:", _s)
+					arg = arg + _s
+				}
+
+				// fmt.Println("current arg:", arg)
+			}
+
+			fmt.Println("args", len(args), args)
+			for _, s := range args {
+				fmt.Println("single arg", len(s), s)
+			}
+			return strings.Join(args, "")
+		}
+	}
+
+	return ""
+}
+
+func extractNonQuoted(input string) string {
+	echo := strings.Join(strings.Fields(input[len("echo")+1:]), " ")
+	return echo
 }
 
 func runCdCmd(dir string) {
