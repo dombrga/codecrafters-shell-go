@@ -39,7 +39,7 @@ func main() {
 
 		// without the \n
 		var input = strings.TrimSpace(c)
-		var command = strings.SplitAfterN(input, " ", 2)[0]
+		var command = strings.SplitN(input, " ", 2)[0]
 
 		switch command {
 		case "":
@@ -54,7 +54,6 @@ func main() {
 			runCdCmd(input)
 		case typeCommand:
 			runTypeCmd(input)
-
 		default:
 			runExtraCmd(input)
 		}
@@ -62,7 +61,7 @@ func main() {
 }
 
 func runExtraCmd(input string) {
-	var command = strings.SplitAfterN(input, " ", 2)[0]
+	var command = strings.SplitN(input, " ", 2)[0]
 	args := extractSingleQuoted(input)
 
 	if s, ok := args["quoteds"]; ok {
@@ -81,7 +80,7 @@ func runExtraCmd(input string) {
 }
 
 func runTypeCmd(input string) {
-	split := strings.SplitAfterN(input, " ", 2)
+	split := strings.SplitN(input, " ", 2)
 	if len(split) > 1 {
 		typeArg := split[1]
 		_, ok := builtinCmds[typeArg]
@@ -118,6 +117,7 @@ func runExitCmd() {
 
 // it first checks if the echo argument is enclosed in single quotes
 func runEchoCmd(input string) {
+	// var command = strings.SplitN(input, " ", 2)[0]
 	if isSingleQuoted(input) {
 		args := extractSingleQuoted(input)
 		if s, ok := args["unquoteds"]; ok {
@@ -132,7 +132,7 @@ func isSingleQuoted(input string) bool {
 	split := strings.Split(input, " ")
 	if len(split) > 1 {
 		// split command and arguments
-		s := strings.SplitAfterN(input, " ", 2)
+		s := strings.SplitN(input, " ", 2)
 
 		argSingleQuoted := strings.Split(s[1], "")
 		if argSingleQuoted[0] == "'" && argSingleQuoted[len(argSingleQuoted)-1] == "'" {
@@ -146,7 +146,7 @@ func extractSingleQuoted(input string) map[string][]string {
 	split := strings.Split(input, " ")
 	if len(split) > 1 {
 		// split command and arguments
-		s := strings.SplitAfterN(input, " ", 2)
+		s := strings.SplitN(input, " ", 2)
 
 		argSingleQuoted := strings.Split(s[1], "")
 		var quoteds []string
