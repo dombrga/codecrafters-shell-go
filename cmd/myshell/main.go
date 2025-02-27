@@ -82,13 +82,17 @@ func main() {
 		default:
 			// fmt.Println("defaulting", extractSingleQuoted(input))
 			// external programs that are in PATH
-			runCmd := exec.Command(command, extractSingleQuoted(input)...)
-			runCmd.Stdout = os.Stdout
-			runCmd.Stderr = os.Stderr
-			err := runCmd.Run()
-			if err != nil {
-				if strings.Contains(err.Error(), exec.ErrNotFound.Error()) {
-					fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
+			args := extractSingleQuoted(input)
+			if s, ok := args["unquoteds"]; ok {
+				// fmt.Fprintln(os.Stdout, strings.Join(s, ""))
+				runCmd := exec.Command(command, s...)
+				runCmd.Stdout = os.Stdout
+				runCmd.Stderr = os.Stderr
+				err := runCmd.Run()
+				if err != nil {
+					if strings.Contains(err.Error(), exec.ErrNotFound.Error()) {
+						fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
+					}
 				}
 			}
 		}
@@ -99,7 +103,10 @@ func main() {
 func runEchoCmd(input string) {
 	if isSingleQuoted(input) {
 		args := extractSingleQuoted(input)
-		fmt.Fprintln(os.Stdout, strings.Join(args, ""))
+		// fmt.Println("args", args)
+		if s, ok := args["unquoteds"]; ok {
+			fmt.Fprintln(os.Stdout, strings.Join(s, ""))
+		}
 	} else {
 		fmt.Fprintln(os.Stdout, extractNonQuoted(input))
 	}
@@ -119,46 +126,42 @@ func isSingleQuoted(input string) bool {
 	return false
 }
 
-func extractSingleQuoted(input string) []string {
+func extractSingleQuoted(input string) map[string][]string {
 	split := strings.Split(input, " ")
 	if len(split) > 1 {
 		// split command and arguments
 		s := strings.SplitAfterN(input, " ", 2)
 
 		argSingleQuoted := strings.Split(s[1], "")
-		var args []string
+		var quoteds []string
+		var unquoteds []string
 		if argSingleQuoted[0] == "'" && argSingleQuoted[len(argSingleQuoted)-1] == "'" {
-			arg := ""
+			unquoted := ""
+			// quoted := ""
 			sQuote := 0
 			for _, _s := range argSingleQuoted {
-				// fmt.Println("single arg:", _s)
 				if _s == "'" {
-					// fmt.Println("single quote:", _s, sQuote)
 					sQuote++
 					if sQuote == 2 {
-						args = append(args, arg)
+						unquoteds = append(unquoteds, unquoted)
+						quoteds = append(quoteds, "'"+unquoted+"'")
 						sQuote = 0
-						arg = ""
+						unquoted = ""
 					}
 				} else {
-					// fmt.Println("single not quote:", _s)
-					arg = arg + _s
+					unquoted = unquoted + _s
 				}
-
-				// fmt.Println("current arg:", arg)
 			}
 
-			// fmt.Println("args", len(args), args)
-			// for _, s := range args {
-			// 	fmt.Println("single arg", len(s), s)
-			// }
-			return args
-			// return strings.Join(args, "")
+			return map[string][]string{
+				"quoteds":   quoteds,
+				"unquoteds": unquoteds,
+			}
 		}
 	}
 
 	// return ""
-	return []string{}
+	return map[string][]string{}
 }
 
 func extractNonQuoted(input string) string {
