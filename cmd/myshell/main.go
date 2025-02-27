@@ -82,7 +82,7 @@ func main() {
 		default:
 			fmt.Println("defaulting", extractSingleQuoted(input))
 			// external programs that are in PATH
-			runCmd := exec.Command(command, split[1:]...)
+			runCmd := exec.Command(command, extractSingleQuoted(input)...)
 			runCmd.Stdout = os.Stdout
 			runCmd.Stderr = os.Stderr
 			err := runCmd.Run()
@@ -98,7 +98,8 @@ func main() {
 // it first checks if the echo argument is enclosed in single quotes
 func runEchoCmd(input string) {
 	if isSingleQuoted(input) {
-		fmt.Fprintln(os.Stdout, extractSingleQuoted(input))
+		args := extractSingleQuoted(input)
+		fmt.Fprintln(os.Stdout, strings.Join(args, ""))
 	} else {
 		fmt.Fprintln(os.Stdout, extractNonQuoted(input))
 	}
@@ -118,7 +119,7 @@ func isSingleQuoted(input string) bool {
 	return false
 }
 
-func extractSingleQuoted(input string) string {
+func extractSingleQuoted(input string) []string {
 	split := strings.Split(input, " ")
 	if len(split) > 1 {
 		// split command and arguments
@@ -151,11 +152,13 @@ func extractSingleQuoted(input string) string {
 			// for _, s := range args {
 			// 	fmt.Println("single arg", len(s), s)
 			// }
-			return strings.Join(args, "")
+			return args
+			// return strings.Join(args, "")
 		}
 	}
 
-	return ""
+	// return ""
+	return []string{}
 }
 
 func extractNonQuoted(input string) string {
