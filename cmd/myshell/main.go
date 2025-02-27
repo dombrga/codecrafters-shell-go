@@ -147,10 +147,10 @@ func extractSingleQuoted(input string) string {
 				// fmt.Println("current arg:", arg)
 			}
 
-			fmt.Println("args", len(args), args)
-			for _, s := range args {
-				fmt.Println("single arg", len(s), s)
-			}
+			// fmt.Println("args", len(args), args)
+			// for _, s := range args {
+			// 	fmt.Println("single arg", len(s), s)
+			// }
 			return strings.Join(args, "")
 		}
 	}
