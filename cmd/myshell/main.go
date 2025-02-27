@@ -62,8 +62,8 @@ func main() {
 
 func runExtraCmd(input string) {
 	// fmt.Println("extraa")
-	var _input = strings.SplitN(input, " ", 2)
-	var command = _input[0]
+	var split = strings.Split(input, " ")
+	var command = split[0]
 	args := extractSingleQuoted(input)
 
 	if s, ok := args["quoteds"]; ok {
@@ -80,8 +80,12 @@ func runExtraCmd(input string) {
 			}
 		}
 	} else {
+		// fmt.Println("extraa else")
 		// external programs that are in PATH
-		runCmd := exec.Command(command, _input[1])
+		runCmd := exec.Command(command)
+		if len(split) > 1 {
+			runCmd = exec.Command(command, split[:1]...)
+		}
 		runCmd.Stdout = os.Stdout
 		runCmd.Stderr = os.Stderr
 
