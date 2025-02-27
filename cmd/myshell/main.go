@@ -80,7 +80,7 @@ func main() {
 				}
 			}
 		default:
-			fmt.Println("defaulting", extractSingleQuoted(input))
+			// fmt.Println("defaulting", extractSingleQuoted(input))
 			// external programs that are in PATH
 			runCmd := exec.Command(command, extractSingleQuoted(input)...)
 			runCmd.Stdout = os.Stdout
