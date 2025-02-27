@@ -39,71 +39,87 @@ func main() {
 
 		// without the \n
 		var input = strings.TrimSpace(c)
-		var split = strings.Split(input, " ")
-		var command = split[0]
-		// var args = input[1:]
+		var command = strings.SplitAfterN(input, " ", 2)[0]
 
-		// fmt.Println("asdzxc", builtinCmds[command], len(builtinCmds[command]))
 		switch command {
 		case "":
-			fmt.Print("")
+			runEmpty()
 		case exitCommand:
-			os.Exit(0)
+			runExitCmd()
 		case echoCommand:
-			// fmt.Fprintln(os.Stdout, strings.Join(split[1:], " "))
 			runEchoCmd(input)
 		case pwdCommand:
-			dir, err := os.Getwd()
-			if err != nil {
-				fmt.Fprintln(os.Stdout, "error printing working directory:", err)
-			} else {
-				fmt.Fprintln(os.Stdout, dir)
-			}
+			runPwdCmd()
 		case cdCommand:
-			if len(split) > 1 {
-				runCdCmd(split[1])
-			}
+			runCdCmd(input)
 		case typeCommand:
-			if len(split) > 1 {
-				typeArg := split[1]
-				_, ok := builtinCmds[typeArg]
+			runTypeCmd(input)
 
-				if ok {
-					fmt.Fprintf(os.Stdout, "%s is a shell builtin\n", typeArg)
-				} else {
-					isInCmd, p := isCmdInPath(typeArg)
-					if isInCmd {
-						fmt.Fprintf(os.Stdout, "%s is %s/%s\n", typeArg, p, typeArg)
-					} else {
-						fmt.Fprintf(os.Stdout, "%s: not found\n", typeArg)
-					}
-				}
-			}
 		default:
-			// fmt.Println("defaulting", extractSingleQuoted(input))
-			// external programs that are in PATH
-			args := extractSingleQuoted(input)
-			if s, ok := args["quoteds"]; ok {
-				// fmt.Fprintln(os.Stdout, len(s[0]), s[0])
-				runCmd := exec.Command(command, s...)
-				runCmd.Stdout = os.Stdout
-				runCmd.Stderr = os.Stderr
-				err := runCmd.Run()
-				if err != nil {
-					if strings.Contains(err.Error(), exec.ErrNotFound.Error()) {
-						fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
-					}
-				}
+			runExtraCmd(input)
+		}
+	}
+}
+
+func runExtraCmd(input string) {
+	var command = strings.SplitAfterN(input, " ", 2)[0]
+	args := extractSingleQuoted(input)
+
+	if s, ok := args["quoteds"]; ok {
+		// external programs that are in PATH
+		runCmd := exec.Command(command, s...)
+		runCmd.Stdout = os.Stdout
+		runCmd.Stderr = os.Stderr
+
+		err := runCmd.Run()
+		if err != nil {
+			if strings.Contains(err.Error(), exec.ErrNotFound.Error()) {
+				fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
 			}
 		}
 	}
+}
+
+func runTypeCmd(input string) {
+	split := strings.SplitAfterN(input, " ", 2)
+	if len(split) > 1 {
+		typeArg := split[1]
+		_, ok := builtinCmds[typeArg]
+
+		if ok {
+			fmt.Fprintf(os.Stdout, "%s is a shell builtin\n", typeArg)
+		} else {
+			isInCmd, p := isCmdInPath(typeArg)
+			if isInCmd {
+				fmt.Fprintf(os.Stdout, "%s is %s/%s\n", typeArg, p, typeArg)
+			} else {
+				fmt.Fprintf(os.Stdout, "%s: not found\n", typeArg)
+			}
+		}
+	}
+}
+
+func runPwdCmd() {
+	dir, err := os.Getwd()
+	if err != nil {
+		fmt.Fprintln(os.Stdout, "error printing working directory:", err)
+	} else {
+		fmt.Fprintln(os.Stdout, dir)
+	}
+}
+
+func runEmpty() {
+	fmt.Print("")
+}
+
+func runExitCmd() {
+	os.Exit(0)
 }
 
 // it first checks if the echo argument is enclosed in single quotes
 func runEchoCmd(input string) {
 	if isSingleQuoted(input) {
 		args := extractSingleQuoted(input)
-		// fmt.Println("args", args)
 		if s, ok := args["unquoteds"]; ok {
 			fmt.Fprintln(os.Stdout, strings.Join(s, ""))
 		}
@@ -176,15 +192,19 @@ func extractNonQuoted(input string) string {
 	return echo
 }
 
-func runCdCmd(dir string) {
-	var _dir = dir
-	if dir == "~" {
-		_dir = os.Getenv("HOME")
-	}
+func runCdCmd(input string) {
+	split := strings.Split(input, " ")
+	dir := split[1]
 
-	err := os.Chdir(_dir)
-	if err != nil {
-		fmt.Printf("cd: %s: No such file or directory\n", _dir)
+	if len(split) > 1 {
+		if dir == "~" {
+			dir = os.Getenv("HOME")
+		}
+
+		err := os.Chdir(dir)
+		if err != nil {
+			fmt.Printf("cd: %s: No such file or directory\n", dir)
+		}
 	}
 }
 
