@@ -82,10 +82,10 @@ func runExtraCmd(input string) {
 	} else {
 		// fmt.Println("extraa else")
 		// external programs that are in PATH
-		runCmd := exec.Command(command)
-		if len(split) > 1 {
-			runCmd = exec.Command(command, split[:1]...)
-		}
+		// runCmd := exec.Command(command)
+		// if len(split) > 1 {
+		// }
+		runCmd := exec.Command(command, split[:1]...)
 		runCmd.Stdout = os.Stdout
 		runCmd.Stderr = os.Stderr
 
