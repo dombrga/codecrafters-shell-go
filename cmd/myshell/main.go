@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-var exitCommand = "exit"
+var exitCmd = "exit"
 var exit0Command = "exit 0"
 var echoCommand = "echo"
 var typeCommand = "type"
@@ -15,7 +15,7 @@ var pwdCommand = "pwd"
 var cdCommand = "cd"
 var builtinCmds = map[string]string{
 	echoCommand: echoCommand,
-	exitCommand: exitCommand,
+	exitCmd:     exitCmd,
 	typeCommand: typeCommand,
 	pwdCommand:  pwdCommand,
 	cdCommand:   cdCommand,
@@ -25,6 +25,10 @@ var _PATH = os.Getenv("PATH")
 var paths = strings.Split(_PATH, string(os.PathListSeparator))
 
 func main() {
+	startRepl()
+}
+
+func startRepl() {
 	for {
 		fmt.Fprint(os.Stdout, "$ ")
 
@@ -37,26 +41,34 @@ func main() {
 		}
 
 		// without the \n
-		var input = strings.TrimSpace(c)
-		var command = strings.SplitN(input, " ", 2)[0]
+		input := strings.TrimSpace(c)
+		_split := split(input)
+		command := _split[0]
+		// _args := _split[1]
 
-		fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
-
-		// switch command {
-		// case "":
-		// runEmpty()
-		// case exitCommand:
-		// 	runExitCmd()
-		// case echoCommand:
-		// 	runEchoCmd(input)
-		// case pwdCommand:
-		// 	runPwdCmd()
-		// case cdCommand:
-		// 	runCdCmd(input)
-		// case typeCommand:
-		// 	runTypeCmd(input)
-		// default:
-		// 	runExtraCmd(input)
-		// }
+		switch command {
+		case "":
+			fmt.Fprintf(os.Stdout, "\n")
+		case exitCmd:
+			runExitCmd(input)
+		default:
+			runInvalidCmd(input)
+		}
 	}
+}
+
+func split(input string) []string {
+	return strings.SplitN(input, " ", 2)
+}
+
+func runInvalidCmd(input string) {
+	fmt.Fprintf(os.Stdout, "%s\n", GetInvalidPrint(input))
+}
+
+func GetInvalidPrint(input string) string {
+	return fmt.Sprintf("%s: command not found", input)
+}
+
+func runExitCmd(input string) {
+	os.Exit(0)
 }
