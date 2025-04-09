@@ -42,8 +42,8 @@ func startRepl() {
 
 		// without the \n
 		input := strings.TrimSpace(c)
-		_split := split(input)
-		command := _split[0]
+		command := getCommand(input)
+		// command := _split[0]
 		// _args := _split[1]
 
 		switch command {
@@ -51,14 +51,30 @@ func startRepl() {
 			fmt.Fprintf(os.Stdout, "\n")
 		case exitCmd:
 			runExitCmd(input)
+		case echoCommand:
+			runEchoCmd(input)
 		default:
 			runInvalidCmd(input)
 		}
 	}
 }
 
-func split(input string) []string {
-	return strings.SplitN(input, " ", 2)
+func getCommand(input string) string {
+	// return strings.Fields(input)[0]
+	return strings.SplitN(input, " ", 2)[0]
+}
+
+func runEchoCmd(input string) {
+	fmt.Fprintf(os.Stdout, "%s\n", GetEchoPrint(input))
+}
+
+func GetEchoPrint(input string) string {
+	args := getEchoArg(input)
+	return fmt.Sprintf(args)
+}
+
+func getEchoArg(input string) string {
+	return strings.TrimSpace(strings.SplitN(input, " ", 2)[1])
 }
 
 func runInvalidCmd(input string) {
